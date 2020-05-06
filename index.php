@@ -3,6 +3,7 @@
 <!--author: Reforest Sri Lanka | 05-2020-->
 <?php
 /////loading google sheets api to load past and upcoming events data. replace with your own data source
+// google/ GIT IGNORED - PLEASE SETUP YOUR OWN DATA SOURCE
 require_once 'google/vendor/autoload.php';
 require_once 'google/vendor/googlesheetdata.php'; //gsheetid
 
