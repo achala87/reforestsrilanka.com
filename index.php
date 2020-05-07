@@ -4,20 +4,62 @@
 <?php
 /////loading google sheets api to load past and upcoming events data. replace with your own data source
 // google/ GIT IGNORED - PLEASE SETUP YOUR OWN DATA SOURCE
-require_once 'google/vendor/autoload.php';
-require_once 'google/vendor/googlesheetdata.php'; //gsheetid
+// require_once 'google/vendor/autoload.php';
+// require_once 'google/vendor/googlesheetdata.php'; //gsheetid
 
-$client = new \Google_Client();
-$client->setApplicationName('reforestweb');
-$client->setScopes([\Google_Service_Sheets::SPREADSHEETS]);
-$client->setAccessType('offline');
-//LIVE SITE: $client->setAuthConfig(__DIR__ . '/google/reforestwebsite-f4325a8b651f.json');
-$client->setAuthConfig(__DIR__ . '\google\reforestwebsite-f4325a8b651f.json'); 
-$service = new Google_Service_Sheets($client);
-$range = 'Sheet1!A2:E';
-$response = $service->spreadsheets_values->get($spreadsheetId, $range);
-$values = $response->getValues();
+// $client = new \Google_Client();
+// $client->setApplicationName('reforestweb');
+// $client->setScopes([\Google_Service_Sheets::SPREADSHEETS]);
+// $client->setAccessType('offline');
+// //LIVE SITE: $client->setAuthConfig(__DIR__ . '/google/reforestwebsite-f4325a8b651f.json');
+// $client->setAuthConfig(__DIR__ . '\google\reforestwebsite-f4325a8b651f.json'); 
+// $service = new Google_Service_Sheets($client);
+// $range = 'Sheet1!A2:E';
+// $response = $service->spreadsheets_values->get($spreadsheetId, $range);
+// $values = $response->getValues();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+require_once('lib/PHPMailer/PHPMailerAutoload.php');
+
+  $userName = "";
+  $userEmail = "";
+  $phoneNumber = "";
+  $message = "";
+  $errors = ["title"=>"", "userEmail"=>"", "phoneNumber"=>""];
+  if(isset($_POST["submit"])){
+    $userName = $_POST["userName"];
+    $userEmail = $_POST["userEmail"];
+    $phoneNumber = $_POST["phoneNumber"];
+    $message = $_POST["msg"];
+
+    $body = "<p><b>Name</b> : $userName</p>\n<p><b>Email</b> : $userEmail</p> \n<p><b>phoneNumber</b> : $phoneNumber</p>\n<p><b>Message</b> : $message</p>\n";
+    
+    // Use PHPMailer class.
+    $mail = new PHPMailer();
+
+    $mail->isSMTP();
+    $mail->SMTPAuth = true;
+    $mail->SMTPSecure = 'ssl';
+    $mail->Host = 'smtp.gmail.com';
+    $mail->Port = '465';
+    $mail->isHTML();
+    // Add email of the account.
+    $mail->Username = '<email>';
+    // Add password of the account
+    $mail->Password = '<password>';
+    $mail->SetFrom('<email>','<name>');
+    $mail->Subject = "Your email Subject";
+
+    $mail->Body = $body;
+
+    $mail->AddAddress('<send-email>');
+    $result = $mail->Send();
+    if($result == 1){
+      echo "OK Message";
+    } else {
+      echo "Sorry. Failure Message";
+    }
+  }
 ?>
 
 <head>
@@ -108,7 +150,7 @@ $values = $response->getValues();
           <div class="col-lg-4 col-md-4 col-sm-12">    
             <h3 class="feature-title">Get in Touch!</h3>
             <div id="mail-status"></div>
-            <form>
+            <form action="index.php" method="POST">
             <div class="form-group">
             <input type="text" class="form-control" placeholder="Name" id="userName" name="userName">
             </div>
@@ -123,7 +165,7 @@ $values = $response->getValues();
             <textarea class="form-control" name="msg" id="msg" rows="4"></textarea>
             </div>
             <small id="emailHelp" class="form-text text-muted">We'll never share your email/ number with anyone else.</small>
-            <button type="submit" class="btn btn-block" onClick="sendContact();">Submit</button>
+            <button name="submit" type="submit" class="btn btn-block">Submit</button>
           </form>
           </div>
         </div> 
@@ -502,23 +544,6 @@ We also use modern equipment including Earth Augers to ensure we carry out tree 
     }, 2000);
     });
 
-    function sendContact() {
-    //var valid;	
-    //valid = validateContact();
-    //if(valid) {
-        jQuery.ajax({
-            url: "sendmail.php",
-            data:'userName='+$("#userName").val()+'&userEmail='+
-            $("#userEmail").val()+'&subject='+
-            $("#subject").val()+'&content='+
-            $(content).val(),
-            type: "POST",
-            success:function(data){
-                $("#mail-status").html(data);
-            },
-            error:function (){}
-        });
-    //}
 }
 
   </script>
