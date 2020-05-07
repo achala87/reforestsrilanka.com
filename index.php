@@ -6,18 +6,117 @@
 // google/ GIT IGNORED - PLEASE SETUP YOUR OWN DATA SOURCE
 require_once 'google/vendor/autoload.php';
 require_once 'google/vendor/googlesheetdata.php'; //gsheetid
+require_once('lib/PHPMailer/PHPMailerAutoload.php');
 
-$client = new \Google_Client();
-$client->setApplicationName('reforestweb');
-$client->setScopes([\Google_Service_Sheets::SPREADSHEETS]);
-$client->setAccessType('offline');
-//LIVE SITE: $client->setAuthConfig(__DIR__ . '/google/reforestwebsite-f4325a8b651f.json');
-$client->setAuthConfig(__DIR__ . '\google\reforestwebsite-f4325a8b651f.json'); 
-$service = new Google_Service_Sheets($client);
-$range = 'Sheet1!A2:E';
-$response = $service->spreadsheets_values->get($spreadsheetId, $range);
-$values = $response->getValues();
-////////////////////////////////////////////////////////////////////////////////////////////////////////
+  $client = new \Google_Client();
+  $client->setApplicationName('reforestweb');
+  $client->setScopes([\Google_Service_Sheets::SPREADSHEETS]);
+  $client->setAccessType('offline');
+  //LIVE SITE: $client->setAuthConfig(__DIR__ . '/google/reforestwebsite-f4325a8b651f.json');
+  $client->setAuthConfig(__DIR__ . '\google\reforestwebsite-f4325a8b651f.json'); 
+  $service = new Google_Service_Sheets($client);
+  $range = 'Sheet1!A2:E';
+  $response = $service->spreadsheets_values->get($spreadsheetId, $range);
+  $values = $response->getValues();
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+  // For form validation and send email to the reforest lanka and the user
+  $userName = "";
+  $userEmail = "";
+  $phoneNumber = "";
+  $message = "";
+  $errors = ["userName"=>"", "userEmail"=>"", "phoneNumber"=>""];
+
+  // When user submits the form.
+  if(isset($_POST["submit"])){
+    if(empty($_POST["userName"])){
+      $errors["userName"] = "Name is required <br/>";
+    } else {
+      // To remove malfunction user inputs.
+      $userName = htmlspecialchars($_POST["userName"]);
+      if(!preg_match('/^[a-zA-Z\s]+$/',$userName)){
+          $errors["userName"] = "Name must only containe letters and spaces <br/>";
+      } 
+    }
+    // Check whether both email and phone number is empty.
+    if(empty($_POST["userEmail"]) and empty($_POST["phoneNumber"])){
+      $errors["userEmail"] = "An email or phone number is required <br/>";
+      $errors["phoneNumber"] = "An email or phone number is required <br/>";
+    } else {
+      $userEmail = htmlspecialchars($_POST["userEmail"]);
+      $phoneNumber = htmlspecialchars($_POST["phoneNumber"]);
+      if(!empty($_POST["userEmail"]) and !filter_var($userEmail,FILTER_VALIDATE_EMAIL)){
+          $errors["userEmail"] = "Email must be a valid email address <br/>";
+      } else if(!empty($_POST["phoneNumber"]) and !preg_match('/^[0-9]{9,10}$/',$phoneNumber)){
+        $errors["phoneNumber"] = "Phone number must be a valid number <br/>";
+      } 
+    }
+    $message = $_POST["msg"];
+
+    if(!array_filter($errors)){
+
+      // Setup email body.
+      $body = "<p><b>Name</b> : $userName</p>\n<p><b>Email</b> : $userEmail</p> \n<p><b>phoneNumber</b> : $phoneNumber</p>\n<p><b>Message</b> : $message</p>\n";
+      
+      // Use PHPMailer class.
+      $mail = new PHPMailer();
+
+      $mail->isSMTP();
+      $mail->SMTPAuth = true;
+      $mail->SMTPSecure = 'ssl';
+      $mail->Host = 'smtp.gmail.com';
+      $mail->Port = '465';
+      $mail->isHTML();
+      // Add email of the account.
+      $mail->Username = '<sender-email>';
+      // Add password of the account
+      $mail->Password = '<sender-email-password>';
+      $mail->SetFrom('<sender-email>','<name>');
+      $mail->Subject = "Get in touch - Reforest SriLanka";
+
+      $mail->Body = $body;
+      
+      // This message must be come to the reforest srilanka
+      $mail->AddAddress('<reciever-email>');
+      $result = $mail->Send();
+      if($result == 1){
+        // Done echo "OK Message";
+      } else {
+        // Failed echo "Sorry. Failure Message";
+      }
+
+      // Email will be send to the user if he filled a valid email.
+      if(!empty($_POST["userEmail"])){
+        $mailToUser = new PHPMailer();
+
+        $mailToUser->isSMTP();
+        $mailToUser->SMTPAuth = true;
+        $mailToUser->SMTPSecure = 'ssl';
+        $mailToUser->Host = 'smtp.gmail.com';
+        $mailToUser->Port = '465';
+        $mailToUser->isHTML();
+        // Add email of the account.
+        $mailToUser->Username = '<sender-email >';
+        // Add password of the account
+        $mailToUser->Password = '<sender-email-password>';
+        $mailToUser->SetFrom('<sender-email>','<name>');
+        $mailToUser->Subject = "Get in touch - Reforest SriLanka";
+
+        // Message which should be go to the user.
+        $mailToUser->Body = "Thank you for join with us";
+
+        $mailToUser->AddAddress($userEmail);
+        $result = $mailToUser->Send();
+        if($result == 1){
+          // Done echo "OK Message";
+        } else {
+          // Failed echo "Sorry. Failure Message";
+        }
+      }
+      header("Location: index.php");
+    }
+  }
 ?>
 
 <head>
@@ -34,7 +133,7 @@ $values = $response->getValues();
 <body>
 
     <nav class="navbar navbar-expand-md">
-        <a class="navbar-brand" href="images/small_logo.png">Reforest Sri Lanka</a>
+        <a class="navbar-brand" href="index.php">Reforest Sri Lanka</a>
         <button class="navbar-toggler navbar-dark" type="button" data-toggle="collapse" data-target="#main-navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -108,22 +207,24 @@ $values = $response->getValues();
           <div class="col-lg-4 col-md-4 col-sm-12">    
             <h3 class="feature-title">Get in Touch!</h3>
             <div id="mail-status"></div>
-            <form>
+            <form action="index.php" method="POST">
             <div class="form-group">
-            <input type="text" class="form-control" placeholder="Name" id="userName" name="userName">
+              <input type="text" class="form-control" placeholder="Name" id="userName" name="userName" value="<?php echo htmlspecialchars($userName)?>">
+              <div style="color:red;"><?php echo $errors["userName"];?></div>
             </div>
             <div class="form-group">
-              <input type="email" class="form-control" id="userEmail" name="userEmail" placeholder="Enter email">
-             
+              <input type="email" class="form-control" id="userEmail" name="userEmail" placeholder="Enter email" value="<?php echo htmlspecialchars($userEmail)?>">
+              <div style="color:red;"><?php echo $errors["userEmail"];?></div>
             </div>
             <div class="form-group">
-            <input type="phone" class="form-control" placeholder="Phone Number" name="phoneNumber" id="phoneNumber">
+              <input type="phone" class="form-control" placeholder="Phone Number" name="phoneNumber" id="phoneNumber" value="<?php echo htmlspecialchars($phoneNumber)?>">
+              <div style="color:red;"><?php echo $errors["phoneNumber"];?></div>
             </div>
             <div class="form-group">
-            <textarea class="form-control" name="msg" id="msg" rows="4"></textarea>
+            <textarea class="form-control" name="msg" id="msg" rows="4" value="<?php echo htmlspecialchars($message)?>"></textarea>
             </div>
             <small id="emailHelp" class="form-text text-muted">We'll never share your email/ number with anyone else.</small>
-            <button type="submit" class="btn btn-block" onClick="sendContact();">Submit</button>
+            <button name="submit" type="submit" class="btn btn-block">Submit</button>
           </form>
           </div>
         </div> 
@@ -501,25 +602,6 @@ We also use modern equipment including Earth Augers to ensure we carry out tree 
         scrollTop: $(".buymerchandise").offset().top
     }, 2000);
     });
-
-    function sendContact() {
-    //var valid;	
-    //valid = validateContact();
-    //if(valid) {
-        jQuery.ajax({
-            url: "sendmail.php",
-            data:'userName='+$("#userName").val()+'&userEmail='+
-            $("#userEmail").val()+'&subject='+
-            $("#subject").val()+'&content='+
-            $(content).val(),
-            type: "POST",
-            success:function(data){
-                $("#mail-status").html(data);
-            },
-            error:function (){}
-        });
-    //}
-}
 
   </script>
 
