@@ -2,125 +2,32 @@
 <html lang="en">
 <!--author: Reforest Sri Lanka | 05-2020-->
 <?php
+//display errors
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 /////loading google sheets api to load past and upcoming events data. replace with your own data source
 // google/ GIT IGNORED - PLEASE SETUP YOUR OWN DATA SOURCE
 require_once 'google/vendor/autoload.php';
 require_once 'google/vendor/googlesheetdata.php'; //gsheetid
-require_once('lib/PHPMailer/PHPMailerAutoload.php');
 
   $client = new \Google_Client();
   $client->setApplicationName('reforestweb');
   $client->setScopes([\Google_Service_Sheets::SPREADSHEETS]);
   $client->setAccessType('offline');
   //LIVE SITE: $client->setAuthConfig(__DIR__ . '/google/reforestwebsite-f4325a8b651f.json');
-  $client->setAuthConfig(__DIR__ . '\google\reforestwebsite-f4325a8b651f.json'); 
+  $client->setAuthConfig(__DIR__ . '/google/reforestwebsite-f4325a8b651f.json'); 
   $service = new Google_Service_Sheets($client);
   $range = 'Sheet1!A2:E';
   $response = $service->spreadsheets_values->get($spreadsheetId, $range);
   $values = $response->getValues();
   ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-  // For form validation and send email to the reforest lanka and the user
-  $userName = "";
-  $userEmail = "";
-  $phoneNumber = "";
-  $message = "";
-  $errors = ["userName"=>"", "userEmail"=>"", "phoneNumber"=>""];
-
-  // When user submits the form.
-  if(isset($_POST["submit"])){
-    if(empty($_POST["userName"])){
-      $errors["userName"] = "Name is required <br/>";
-    } else {
-      // To remove malfunction user inputs.
-      $userName = htmlspecialchars($_POST["userName"]);
-      if(!preg_match('/^[a-zA-Z\s]+$/',$userName)){
-          $errors["userName"] = "Name must only containe letters and spaces <br/>";
-      } 
-    }
-    // Check whether both email and phone number is empty.
-    if(empty($_POST["userEmail"]) and empty($_POST["phoneNumber"])){
-      $errors["userEmail"] = "An email or phone number is required <br/>";
-      $errors["phoneNumber"] = "An email or phone number is required <br/>";
-    } else {
-      $userEmail = htmlspecialchars($_POST["userEmail"]);
-      $phoneNumber = htmlspecialchars($_POST["phoneNumber"]);
-      if(!empty($_POST["userEmail"]) and !filter_var($userEmail,FILTER_VALIDATE_EMAIL)){
-          $errors["userEmail"] = "Email must be a valid email address <br/>";
-      } else if(!empty($_POST["phoneNumber"]) and !preg_match('/^[0-9]{9,10}$/',$phoneNumber)){
-        $errors["phoneNumber"] = "Phone number must be a valid number <br/>";
-      } 
-    }
-    $message = $_POST["msg"];
-
-    if(!array_filter($errors)){
-
-      // Setup email body.
-      $body = "<p><b>Name</b> : $userName</p>\n<p><b>Email</b> : $userEmail</p> \n<p><b>phoneNumber</b> : $phoneNumber</p>\n<p><b>Message</b> : $message</p>\n";
-      
-      // Use PHPMailer class.
-      $mail = new PHPMailer();
-
-      $mail->isSMTP();
-      $mail->SMTPAuth = true;
-      $mail->SMTPSecure = 'ssl';
-      $mail->Host = 'smtp.gmail.com';
-      $mail->Port = '465';
-      $mail->isHTML();
-      // Add email of the account.
-      $mail->Username = '<sender-email>';
-      // Add password of the account
-      $mail->Password = '<sender-email-password>';
-      $mail->SetFrom('<sender-email>','<name>');
-      $mail->Subject = "Get in touch - Reforest SriLanka";
-
-      $mail->Body = $body;
-      
-      // This message must be come to the reforest srilanka
-      $mail->AddAddress('<reciever-email>');
-      $result = $mail->Send();
-      if($result == 1){
-        // Done echo "OK Message";
-      } else {
-        // Failed echo "Sorry. Failure Message";
-      }
-
-      // Email will be send to the user if he filled a valid email.
-      if(!empty($_POST["userEmail"])){
-        $mailToUser = new PHPMailer();
-
-        $mailToUser->isSMTP();
-        $mailToUser->SMTPAuth = true;
-        $mailToUser->SMTPSecure = 'ssl';
-        $mailToUser->Host = 'smtp.gmail.com';
-        $mailToUser->Port = '465';
-        $mailToUser->isHTML();
-        // Add email of the account.
-        $mailToUser->Username = '<sender-email >';
-        // Add password of the account
-        $mailToUser->Password = '<sender-email-password>';
-        $mailToUser->SetFrom('<sender-email>','<name>');
-        $mailToUser->Subject = "Get in touch - Reforest SriLanka";
-
-        // Message which should be go to the user.
-        $mailToUser->Body = "Thank you for join with us";
-
-        $mailToUser->AddAddress($userEmail);
-        $result = $mailToUser->Send();
-        if($result == 1){
-          // Done echo "OK Message";
-        } else {
-          // Failed echo "Sorry. Failure Message";
-        }
-      }
-      header("Location: index.php");
-    }
-  }
 ?>
 
 <head>
-  <title>Reforest Sri Lanka - Sri Lanka's largest citizen driven reforestation movement</title>
+  <title>Reforest Sri Lanka - Sri Lanka's largest non-profit reforestation movement</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;700&display=swap" rel="stylesheet">
@@ -128,6 +35,7 @@ require_once('lib/PHPMailer/PHPMailerAutoload.php');
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link rel="stylesheet" type="text/css" href="main.css">
   <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
+  <link rel="icon" type="image/png" href="images/small_logo.png">
 </head>
 
 <body>
@@ -206,25 +114,30 @@ require_once('lib/PHPMailer/PHPMailerAutoload.php');
 
           <div class="col-lg-4 col-md-4 col-sm-12">    
             <h3 class="feature-title">Get in Touch!</h3>
-            <div id="mail-status"></div>
-            <form action="index.php" method="POST">
+            <!-- Contact form -->
+            <div style="color:green;"> 
+              <div id="ajaxResponse"> </div> <!-- ajax response -->
+            </div>
+            <form id="contactForm">
             <div class="form-group">
-              <input type="text" class="form-control" placeholder="Name" id="userName" name="userName" value="<?php echo htmlspecialchars($userName)?>">
-              <div style="color:red;"><?php echo $errors["userName"];?></div>
+              <input type="text" class="form-control" placeholder="Name" id="userName" required="required" name="userName" value="">
+              
             </div>
             <div class="form-group">
-              <input type="email" class="form-control" id="userEmail" name="userEmail" placeholder="Enter email" value="<?php echo htmlspecialchars($userEmail)?>">
-              <div style="color:red;"><?php echo $errors["userEmail"];?></div>
+              <input type="email" class="form-control" id="userEmail" name="userEmail" placeholder="Enter email" value="">
+              <label id="userEmail-error" class="error" for="userEmail"></label>
             </div>
             <div class="form-group">
-              <input type="phone" class="form-control" placeholder="Phone Number" name="phoneNumber" id="phoneNumber" value="<?php echo htmlspecialchars($phoneNumber)?>">
-              <div style="color:red;"><?php echo $errors["phoneNumber"];?></div>
+              <input type="phone" class="form-control" placeholder="Phone Number" name="phoneNumber" id="phoneNumber" value="">
+              <label id="phoneNumber-error" class="error" for="phoneNumber"></label>
             </div>
             <div class="form-group">
-            <textarea class="form-control" name="msg" id="msg" rows="4" value="<?php echo htmlspecialchars($message)?>"></textarea>
+            <textarea class="form-control" required="required" name="msg" id="msg" rows="4" value=""></textarea>
+            <label id="msg-error" class="error" for="msg"></label>
             </div>
             <small id="emailHelp" class="form-text text-muted">We'll never share your email/ number with anyone else.</small>
-            <button name="submit" type="submit" class="btn btn-block">Submit</button>
+            
+            <input type="submit" class="btn btn-block" value="submit" />
           </form>
           </div>
         </div> 
@@ -534,12 +447,13 @@ We also use modern equipment including Earth Augers to ensure we carry out tree 
     <div class="footer-copyright text-center">© 2020 Copyright: Reforest Sri Lanka</div>
   </footer>
 
-<script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
   <script src="js/main.js"></script>
   <script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.1/dist/jquery.validate.min.js"></script>
+                          
   <script type="text/javascript">
 
     $('.plantslider').slick({
@@ -603,6 +517,114 @@ We also use modern equipment including Earth Augers to ensure we carry out tree 
     }, 2000);
     });
 
+  $(document).ready(function () {
+    jQuery.validator.addMethod('username_rule', function (value, element) {
+      if (/^[a-zA-Z0-9_-]+$/.test(value)) {
+        return true;
+      } else {
+        return false;
+      };
+    });
+    
+    jQuery.validator.addMethod('email_rule', function (value, element) {
+      if (/^([a-zA-Z0-9_\-\.]+)\+?([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/.test(value)) {
+        return true;
+      } else {
+        return false;
+      };
+    });
+
+    jQuery.validator.addMethod('phone_rule', function (value, element) {
+      if (/^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/.test(value)) {
+        return true;
+      } else {
+        return false;
+      };
+    });
+
+    $('#contactForm').validate({
+      rules: {
+        'userEmail': {
+          required: true,
+          email_rule: true
+        },
+        'userName': {
+          required: true,
+        },
+        'phoneNumber': {
+          required: true,
+        },
+      },
+      messages: {
+        'userEmail': "Please enter a valid email address.",
+        'phoneNumber': "Please enter a valid contact number.",
+        'userName': "Please type your name.",
+        'msg': "Please enter your message."
+      }
+    });
+
+     // Variable to hold request
+     var request;
+
+      // Bind to the submit event of our form
+      $("#contactForm").submit(function(event){
+
+        // Prevent default posting of form - put here to work in case of errors
+        event.preventDefault();
+
+        // Abort any pending request
+        if (request) {
+            request.abort();
+        }
+        // setup some local variables
+        var $form = $(this);
+
+        // Let's select and cache all the fields
+        var $inputs = $form.find("input, select, button, textarea");
+
+        // Serialize the data in the form
+        var serializedData = $form.serialize();
+
+        // Let's disable the inputs for the duration of the Ajax request.
+        // Note: we disable elements AFTER the form data has been serialized.
+        // Disabled form elements will not be serialized.
+        $inputs.prop("disabled", true);
+
+        // Fire off the request to /form.php
+        request = $.ajax({
+            url: "sendmail.php",
+            type: "post",
+            data: serializedData
+        });
+
+        // Callback handler that will be called on success
+        request.done(function (response, textStatus, jqXHR){
+            // Log a message to the console
+            //alert(response);
+            //$("ajaxResponse").html(response);
+            $('#ajaxResponse').html('<p>Thank you for messaging us!!!</p>');
+        });
+
+        // Callback handler that will be called on failure
+        request.fail(function (jqXHR, textStatus, errorThrown){
+            // Log the error to the console
+            console.error(
+                "The following error occurred: "+
+                textStatus, errorThrown
+            );
+            $('#ajaxResponse').html('<p>Error please retry.</p>');
+        });
+
+        // Callback handler that will be called regardless
+        // if the request failed or succeeded
+        request.always(function () {
+            // Reenable the inputs
+            $inputs.prop("disabled", false);
+        });
+
+      });
+
+  }); //
   </script>
 
 </body>
