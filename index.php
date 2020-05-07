@@ -6,21 +6,22 @@
 // google/ GIT IGNORED - PLEASE SETUP YOUR OWN DATA SOURCE
 require_once 'google/vendor/autoload.php';
 require_once 'google/vendor/googlesheetdata.php'; //gsheetid
-
-$client = new \Google_Client();
-$client->setApplicationName('reforestweb');
-$client->setScopes([\Google_Service_Sheets::SPREADSHEETS]);
-$client->setAccessType('offline');
-//LIVE SITE: $client->setAuthConfig(__DIR__ . '/google/reforestwebsite-f4325a8b651f.json');
-$client->setAuthConfig(__DIR__ . '\google\reforestwebsite-f4325a8b651f.json'); 
-$service = new Google_Service_Sheets($client);
-$range = 'Sheet1!A2:E';
-$response = $service->spreadsheets_values->get($spreadsheetId, $range);
-$values = $response->getValues();
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 require_once('lib/PHPMailer/PHPMailerAutoload.php');
 
+  $client = new \Google_Client();
+  $client->setApplicationName('reforestweb');
+  $client->setScopes([\Google_Service_Sheets::SPREADSHEETS]);
+  $client->setAccessType('offline');
+  //LIVE SITE: $client->setAuthConfig(__DIR__ . '/google/reforestwebsite-f4325a8b651f.json');
+  $client->setAuthConfig(__DIR__ . '\google\reforestwebsite-f4325a8b651f.json'); 
+  $service = new Google_Service_Sheets($client);
+  $range = 'Sheet1!A2:E';
+  $response = $service->spreadsheets_values->get($spreadsheetId, $range);
+  $values = $response->getValues();
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+  // For form validation and send email to the reforest lanka and the user
   $userName = "";
   $userEmail = "";
   $phoneNumber = "";
@@ -132,7 +133,7 @@ require_once('lib/PHPMailer/PHPMailerAutoload.php');
 <body>
 
     <nav class="navbar navbar-expand-md">
-        <a class="navbar-brand" href="images/small_logo.png">Reforest Sri Lanka</a>
+        <a class="navbar-brand" href="index.php">Reforest Sri Lanka</a>
         <button class="navbar-toggler navbar-dark" type="button" data-toggle="collapse" data-target="#main-navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -601,8 +602,6 @@ We also use modern equipment including Earth Augers to ensure we carry out tree 
         scrollTop: $(".buymerchandise").offset().top
     }, 2000);
     });
-
-}
 
   </script>
 
