@@ -26,15 +26,19 @@ require_once('lib/PHPMailer/PHPMailerAutoload.php');
   $phoneNumber = "";
   $message = "";
   $errors = ["userName"=>"", "userEmail"=>"", "phoneNumber"=>""];
+
+  // When user submits the form.
   if(isset($_POST["submit"])){
     if(empty($_POST["userName"])){
       $errors["userName"] = "Name is required <br/>";
     } else {
+      // To remove malfunction user inputs.
       $userName = htmlspecialchars($_POST["userName"]);
       if(!preg_match('/^[a-zA-Z\s]+$/',$userName)){
           $errors["userName"] = "Name must only containe letters and spaces <br/>";
       } 
     }
+    // Check whether both email and phone number is empty.
     if(empty($_POST["userEmail"]) and empty($_POST["phoneNumber"])){
       $errors["userEmail"] = "An email or phone number is required <br/>";
       $errors["phoneNumber"] = "An email or phone number is required <br/>";
@@ -51,6 +55,7 @@ require_once('lib/PHPMailer/PHPMailerAutoload.php');
 
     if(!array_filter($errors)){
 
+      // Setup email body.
       $body = "<p><b>Name</b> : $userName</p>\n<p><b>Email</b> : $userEmail</p> \n<p><b>phoneNumber</b> : $phoneNumber</p>\n<p><b>Message</b> : $message</p>\n";
       
       // Use PHPMailer class.
@@ -63,21 +68,24 @@ require_once('lib/PHPMailer/PHPMailerAutoload.php');
       $mail->Port = '465';
       $mail->isHTML();
       // Add email of the account.
-      $mail->Username = '<sender-email >';
+      $mail->Username = '<sender-email>';
       // Add password of the account
       $mail->Password = '<sender-email-password>';
       $mail->SetFrom('<sender-email>','<name>');
       $mail->Subject = "Get in touch - Reforest SriLanka";
 
       $mail->Body = $body;
-
-      $mail->AddAddress('<sender-email >');
+      
+      // This message must be come to the reforest srilanka
+      $mail->AddAddress('<reciever-email>');
       $result = $mail->Send();
       if($result == 1){
         // Done echo "OK Message";
       } else {
         // Failed echo "Sorry. Failure Message";
       }
+
+      // Email will be send to the user if he filled a valid email.
       if(!empty($_POST["userEmail"])){
         $mailToUser = new PHPMailer();
 
@@ -94,6 +102,7 @@ require_once('lib/PHPMailer/PHPMailerAutoload.php');
         $mailToUser->SetFrom('<sender-email>','<name>');
         $mailToUser->Subject = "Get in touch - Reforest SriLanka";
 
+        // Message which should be go to the user.
         $mailToUser->Body = "Thank you for join with us";
 
         $mailToUser->AddAddress($userEmail);
