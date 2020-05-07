@@ -4,19 +4,19 @@
 <?php
 /////loading google sheets api to load past and upcoming events data. replace with your own data source
 // google/ GIT IGNORED - PLEASE SETUP YOUR OWN DATA SOURCE
-// require_once 'google/vendor/autoload.php';
-// require_once 'google/vendor/googlesheetdata.php'; //gsheetid
+require_once 'google/vendor/autoload.php';
+require_once 'google/vendor/googlesheetdata.php'; //gsheetid
 
-// $client = new \Google_Client();
-// $client->setApplicationName('reforestweb');
-// $client->setScopes([\Google_Service_Sheets::SPREADSHEETS]);
-// $client->setAccessType('offline');
-// //LIVE SITE: $client->setAuthConfig(__DIR__ . '/google/reforestwebsite-f4325a8b651f.json');
-// $client->setAuthConfig(__DIR__ . '\google\reforestwebsite-f4325a8b651f.json'); 
-// $service = new Google_Service_Sheets($client);
-// $range = 'Sheet1!A2:E';
-// $response = $service->spreadsheets_values->get($spreadsheetId, $range);
-// $values = $response->getValues();
+$client = new \Google_Client();
+$client->setApplicationName('reforestweb');
+$client->setScopes([\Google_Service_Sheets::SPREADSHEETS]);
+$client->setAccessType('offline');
+//LIVE SITE: $client->setAuthConfig(__DIR__ . '/google/reforestwebsite-f4325a8b651f.json');
+$client->setAuthConfig(__DIR__ . '\google\reforestwebsite-f4325a8b651f.json'); 
+$service = new Google_Service_Sheets($client);
+$range = 'Sheet1!A2:E';
+$response = $service->spreadsheets_values->get($spreadsheetId, $range);
+$values = $response->getValues();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 require_once('lib/PHPMailer/PHPMailerAutoload.php');
@@ -25,39 +25,86 @@ require_once('lib/PHPMailer/PHPMailerAutoload.php');
   $userEmail = "";
   $phoneNumber = "";
   $message = "";
-  $errors = ["title"=>"", "userEmail"=>"", "phoneNumber"=>""];
+  $errors = ["userName"=>"", "userEmail"=>"", "phoneNumber"=>""];
   if(isset($_POST["submit"])){
-    $userName = $_POST["userName"];
-    $userEmail = $_POST["userEmail"];
-    $phoneNumber = $_POST["phoneNumber"];
+    if(empty($_POST["userName"])){
+      $errors["userName"] = "Name is required <br/>";
+    } else {
+      $userName = htmlspecialchars($_POST["userName"]);
+      if(!preg_match('/^[a-zA-Z\s]+$/',$userName)){
+          $errors["userName"] = "Name must only containe letters and spaces <br/>";
+      } 
+    }
+    if(empty($_POST["userEmail"]) and empty($_POST["phoneNumber"])){
+      $errors["userEmail"] = "An email or phone number is required <br/>";
+      $errors["phoneNumber"] = "An email or phone number is required <br/>";
+    } else {
+      $userEmail = htmlspecialchars($_POST["userEmail"]);
+      $phoneNumber = htmlspecialchars($_POST["phoneNumber"]);
+      if(!empty($_POST["userEmail"]) and !filter_var($userEmail,FILTER_VALIDATE_EMAIL)){
+          $errors["userEmail"] = "Email must be a valid email address <br/>";
+      } else if(!empty($_POST["phoneNumber"]) and !preg_match('/^[0-9]{9,10}$/',$phoneNumber)){
+        $errors["phoneNumber"] = "Phone number must be a valid number <br/>";
+      } 
+    }
     $message = $_POST["msg"];
 
-    $body = "<p><b>Name</b> : $userName</p>\n<p><b>Email</b> : $userEmail</p> \n<p><b>phoneNumber</b> : $phoneNumber</p>\n<p><b>Message</b> : $message</p>\n";
-    
-    // Use PHPMailer class.
-    $mail = new PHPMailer();
+    if(!array_filter($errors)){
 
-    $mail->isSMTP();
-    $mail->SMTPAuth = true;
-    $mail->SMTPSecure = 'ssl';
-    $mail->Host = 'smtp.gmail.com';
-    $mail->Port = '465';
-    $mail->isHTML();
-    // Add email of the account.
-    $mail->Username = '<email>';
-    // Add password of the account
-    $mail->Password = '<password>';
-    $mail->SetFrom('<email>','<name>');
-    $mail->Subject = "Your email Subject";
+      $body = "<p><b>Name</b> : $userName</p>\n<p><b>Email</b> : $userEmail</p> \n<p><b>phoneNumber</b> : $phoneNumber</p>\n<p><b>Message</b> : $message</p>\n";
+      
+      // Use PHPMailer class.
+      $mail = new PHPMailer();
 
-    $mail->Body = $body;
+      $mail->isSMTP();
+      $mail->SMTPAuth = true;
+      $mail->SMTPSecure = 'ssl';
+      $mail->Host = 'smtp.gmail.com';
+      $mail->Port = '465';
+      $mail->isHTML();
+      // Add email of the account.
+      $mail->Username = '<sender-email >';
+      // Add password of the account
+      $mail->Password = '<sender-email-password>';
+      $mail->SetFrom('<sender-email>','<name>');
+      $mail->Subject = "Get in touch - Reforest SriLanka";
 
-    $mail->AddAddress('<send-email>');
-    $result = $mail->Send();
-    if($result == 1){
-      echo "OK Message";
-    } else {
-      echo "Sorry. Failure Message";
+      $mail->Body = $body;
+
+      $mail->AddAddress('<sender-email >');
+      $result = $mail->Send();
+      if($result == 1){
+        // Done echo "OK Message";
+      } else {
+        // Failed echo "Sorry. Failure Message";
+      }
+      if(!empty($_POST["userEmail"])){
+        $mailToUser = new PHPMailer();
+
+        $mailToUser->isSMTP();
+        $mailToUser->SMTPAuth = true;
+        $mailToUser->SMTPSecure = 'ssl';
+        $mailToUser->Host = 'smtp.gmail.com';
+        $mailToUser->Port = '465';
+        $mailToUser->isHTML();
+        // Add email of the account.
+        $mailToUser->Username = '<sender-email >';
+        // Add password of the account
+        $mailToUser->Password = '<sender-email-password>';
+        $mailToUser->SetFrom('<sender-email>','<name>');
+        $mailToUser->Subject = "Get in touch - Reforest SriLanka";
+
+        $mailToUser->Body = "Thank you for join with us";
+
+        $mailToUser->AddAddress($userEmail);
+        $result = $mailToUser->Send();
+        if($result == 1){
+          // Done echo "OK Message";
+        } else {
+          // Failed echo "Sorry. Failure Message";
+        }
+      }
+      header("Location: index.php");
     }
   }
 ?>
@@ -152,17 +199,19 @@ require_once('lib/PHPMailer/PHPMailerAutoload.php');
             <div id="mail-status"></div>
             <form action="index.php" method="POST">
             <div class="form-group">
-            <input type="text" class="form-control" placeholder="Name" id="userName" name="userName">
+              <input type="text" class="form-control" placeholder="Name" id="userName" name="userName" value="<?php echo htmlspecialchars($userName)?>">
+              <div style="color:red;"><?php echo $errors["userName"];?></div>
             </div>
             <div class="form-group">
-              <input type="email" class="form-control" id="userEmail" name="userEmail" placeholder="Enter email">
-             
+              <input type="email" class="form-control" id="userEmail" name="userEmail" placeholder="Enter email" value="<?php echo htmlspecialchars($userEmail)?>">
+              <div style="color:red;"><?php echo $errors["userEmail"];?></div>
             </div>
             <div class="form-group">
-            <input type="phone" class="form-control" placeholder="Phone Number" name="phoneNumber" id="phoneNumber">
+              <input type="phone" class="form-control" placeholder="Phone Number" name="phoneNumber" id="phoneNumber" value="<?php echo htmlspecialchars($phoneNumber)?>">
+              <div style="color:red;"><?php echo $errors["phoneNumber"];?></div>
             </div>
             <div class="form-group">
-            <textarea class="form-control" name="msg" id="msg" rows="4"></textarea>
+            <textarea class="form-control" name="msg" id="msg" rows="4" value="<?php echo htmlspecialchars($message)?>"></textarea>
             </div>
             <small id="emailHelp" class="form-text text-muted">We'll never share your email/ number with anyone else.</small>
             <button name="submit" type="submit" class="btn btn-block">Submit</button>
