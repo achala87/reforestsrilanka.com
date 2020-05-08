@@ -436,9 +436,6 @@ We also use modern equipment including Earth Augers to ensure we carry out tree 
         </div> 
       </div>
 
-
-
-
   <footer class="page-footer">
     <div class="container">
       <div class="row">
@@ -587,50 +584,69 @@ We also use modern equipment including Earth Augers to ensure we carry out tree 
         if (request) {
             request.abort();
         }
-        // setup some local variables
-        var $form = $(this);
 
-        // Let's select and cache all the fields
-        var $inputs = $form.find("input, select, button, textarea");
+        // Get user input values
+        var userName = $('#userName').val();
+        var userEmail = $('#userEmail').val();
+        var phoneNumber = $('#phoneNumber').val();
+        var msg = $('#msg').val();
 
-        // Serialize the data in the form
-        var serializedData = $form.serialize();
+        if (userName != '' && (/^[a-zA-Z0-9_-]+$/.test(userName)) 
+            && userEmail != '' && /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(userEmail)
+            && phoneNumber != '' && /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/.test(phoneNumber)
+            && msg != ''){
 
-        // Let's disable the inputs for the duration of the Ajax request.
-        // Note: we disable elements AFTER the form data has been serialized.
-        // Disabled form elements will not be serialized.
-        $inputs.prop("disabled", true);
+          $('#ajaxResponse').html('<p>We are processing</p>');
+          // setup some local variables
+          var $form = $(this);
 
-        // Fire off the request to /form.php
-        request = $.ajax({
-            url: "sendmail.php",
-            type: "post",
-            data: serializedData
-        });
+          // Let's select and cache all the fields
+          var $inputs = $form.find("input, select, button, textarea");
 
-        // Callback handler that will be called on success
-        request.done(function (response, textStatus, jqXHR){
-            $('#contactForm').trigger("reset");
-            $('#ajaxResponse').html('<p>Thank you for messaging us!!!</p>');
-        });
+          // Serialize the data in the form
+          var serializedData = $form.serialize();
 
-        // Callback handler that will be called on failure
-        request.fail(function (jqXHR, textStatus, errorThrown){
-            // Log the error to the console
-            console.error(
-                "The following error occurred: "+
-                textStatus, errorThrown
-            );
-            $('#ajaxResponse').html('<p>Error please retry.</p>');
-        });
+          // Let's disable the inputs for the duration of the Ajax request.
+          // Note: we disable elements AFTER the form data has been serialized.
+          // Disabled form elements will not be serialized.
+          $inputs.prop("disabled", true);
 
-        // Callback handler that will be called regardless
-        // if the request failed or succeeded
-        request.always(function () {
-            // Reenable the inputs
-            $inputs.prop("disabled", false);
-        });
+          // Fire off the request to /form.php
+          request = $.ajax({
+              url: "sendmail.php",
+              type: "post",
+              data: serializedData
+          });
 
+          // Callback handler that will be called on success
+          request.done(function (response, textStatus, jqXHR){
+              // Log a message to the console
+              //console.log(response);
+              $('#ajaxResponse').html('<p>Thank you for messaging us!!!</p>');
+              $('#userName').val('');
+              $('#userEmail').val('');
+              $('#phoneNumber').val('');
+              $('#msg').val('');
+              setTimeout(function(){ $('#ajaxResponse').html('<p></p>'); }, 3000);
+          });
+
+          // Callback handler that will be called on failure
+          request.fail(function (jqXHR, textStatus, errorThrown){
+              // Log the error to the console
+              console.error(
+                  "The following error occurred: "+
+                  textStatus, errorThrown
+              );
+              $('#ajaxResponse').html('<p>Error please retry.</p>');
+          });
+
+          // Callback handler that will be called regardless
+          // if the request failed or succeeded
+          request.always(function () {
+              // Reenable the inputs
+              $inputs.prop("disabled", false);
+          });
+        }
       });
 
   }); //
