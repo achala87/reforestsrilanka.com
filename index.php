@@ -36,6 +36,17 @@ require_once 'google/vendor/googlesheetdata.php'; //gsheetid
   <link rel="stylesheet" type="text/css" href="main.css">
   <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
   <link rel="icon" type="image/png" href="images/small_logo.png">
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-165906647-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-165906647-1');
+</script>
+
 </head>
 
 <body>
@@ -599,9 +610,7 @@ We also use modern equipment including Earth Augers to ensure we carry out tree 
 
         // Callback handler that will be called on success
         request.done(function (response, textStatus, jqXHR){
-            // Log a message to the console
-            //alert(response);
-            //$("ajaxResponse").html(response);
+            $('#contactForm').trigger("reset");
             $('#ajaxResponse').html('<p>Thank you for messaging us!!!</p>');
         });
 
@@ -625,6 +634,9 @@ We also use modern equipment including Earth Augers to ensure we carry out tree 
       });
 
   }); //
+
+//pub 6Lc7NPQUAAAAAKfUEB6bHdSgGML8cCzJL_FuaY5W
+//6Lc7NPQUAAAAAADKOG-5DDEuDj7caz4Rffb1LSIu
   </script>
 
 </body>
