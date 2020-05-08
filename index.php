@@ -591,12 +591,13 @@ We also use modern equipment including Earth Augers to ensure we carry out tree 
         var phoneNumber = $('#phoneNumber').val();
         var msg = $('#msg').val();
         //alert('hi');
-        if (userName != '' && (/^[a-zA-Z0-9_-]+$/.test(userName)) 
-            && userEmail != '' && /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(userEmail)
-            && phoneNumber != '' && /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/.test(phoneNumber)
+        if (userName != '' && (/^[a-zA-Z0-9_-]+$/.test(escapeHtml(userName))) 
+            && userEmail != '' && /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(escapeHtml(userEmail))
+            && phoneNumber != '' && /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/.test(escapeHtml(phoneNumber))
             && msg != ''){
 
           $('#ajaxResponse').html('<p>We are processing</p>');
+
           // setup some local variables
           var $form = $(this);
 
@@ -621,7 +622,7 @@ We also use modern equipment including Earth Augers to ensure we carry out tree 
           // Callback handler that will be called on success
           request.done(function (response, textStatus, jqXHR){
               // Log a message to the console
-              //console.log(response);
+              // console.log(response);
               $('#ajaxResponse').html('<p>Thank you for messaging us!!!</p>');
               $('#userName').val('');
               $('#userEmail').val('');
@@ -650,6 +651,18 @@ We also use modern equipment including Earth Augers to ensure we carry out tree 
       });
 
   }); //
+
+  function escapeHtml(text) {
+    var map = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    };
+
+    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+  }
   </script>
 
 </body>
