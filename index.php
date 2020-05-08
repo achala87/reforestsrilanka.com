@@ -587,6 +587,8 @@ We also use modern equipment including Earth Augers to ensure we carry out tree 
             && userEmail != '' && /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(userEmail)
             && phoneNumber != '' && /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/.test(phoneNumber)
             && msg != ''){
+
+          $('#ajaxResponse').html('<p>We are processing</p>');
           // setup some local variables
           var $form = $(this);
 
@@ -611,9 +613,14 @@ We also use modern equipment including Earth Augers to ensure we carry out tree 
           // Callback handler that will be called on success
           request.done(function (response, textStatus, jqXHR){
               // Log a message to the console
-              console.log(response);
+              //console.log(response);
               //$("ajaxResponse").html(response);
               $('#ajaxResponse').html('<p>Thank you for messaging us!!!</p>');
+              $('#userName').val('');
+              $('#userEmail').val('');
+              $('#phoneNumber').val('');
+              $('#msg').val('');
+              setTimeout(function(){ $('#ajaxResponse').html('<p></p>'); }, 3000);
           });
 
           // Callback handler that will be called on failure
