@@ -20,7 +20,7 @@ require_once 'google/vendor/googlesheetdata.php'; //gsheetid
 
       // Use PHPMailer class.
       $mail = new PHPMailer();
-     // $mail->SMTPDebug = SMTP::DEBUG_SERVER;
+      $mail->SMTPDebug = SMTP::DEBUG_SERVER;
       $mail->isSMTP();
       $mail->SMTPAuth = true;
       $mail->SMTPSecure = 'ssl';

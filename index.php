@@ -590,7 +590,7 @@ We also use modern equipment including Earth Augers to ensure we carry out tree 
         var userEmail = $('#userEmail').val();
         var phoneNumber = $('#phoneNumber').val();
         var msg = $('#msg').val();
-
+        //alert('hi');
         if (userName != '' && (/^[a-zA-Z0-9_-]+$/.test(userName)) 
             && userEmail != '' && /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(userEmail)
             && phoneNumber != '' && /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/.test(phoneNumber)
@@ -605,7 +605,7 @@ We also use modern equipment including Earth Augers to ensure we carry out tree 
 
           // Serialize the data in the form
           var serializedData = $form.serialize();
-
+          
           // Let's disable the inputs for the duration of the Ajax request.
           // Note: we disable elements AFTER the form data has been serialized.
           // Disabled form elements will not be serialized.
@@ -650,9 +650,6 @@ We also use modern equipment including Earth Augers to ensure we carry out tree 
       });
 
   }); //
-
-//pub 6Lc7NPQUAAAAAKfUEB6bHdSgGML8cCzJL_FuaY5W
-//6Lc7NPQUAAAAAADKOG-5DDEuDj7caz4Rffb1LSIu
   </script>
 
 </body>
