@@ -42,7 +42,7 @@ require_once 'google/vendor/googlesheetdata.php'; //gsheetid
       }
 
       // Email will be send to the user if he filled a valid email.
-      if(!empty($userEmail)){
+      if(!empty($userEmail) and filter_var($userEmail, FILTER_VALIDATE_EMAIL)){
         $mailToUser = new PHPMailer();
 
         $mailToUser->isSMTP();
