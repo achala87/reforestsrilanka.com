@@ -51,6 +51,33 @@ require_once 'google/vendor/googlesheetdata.php'; //gsheetid
 
 <body>
 
+<!-- Load Facebook SDK for JavaScript -->
+  <div id="fb-root"></div>
+    <script>
+      window.fbAsyncInit = function() {
+        FB.init({
+          xfbml: true,
+          version: 'v7.0'
+        });
+      };
+
+      (function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = 'https://connect.facebook.net/en_US/sdk/xfbml.customerchat.js';
+        fjs.parentNode.insertBefore(js, fjs);
+      }(document, 'script', 'facebook-jssdk'));
+    </script>
+
+    <!-- Your customer chat code -->
+    <div class="fb-customerchat"
+        attribution=setup_tool
+        page_id="931549673584648"
+        theme_color="#67b868"
+        logged_in_greeting="Hi! Talk to us about trees, bio-diversity and how we can save them together."
+        logged_out_greeting="Hi! Talk to us about trees, bio-diversity and how we can save them together.">
+    </div>
     <nav class="navbar navbar-expand-md">
         <a class="navbar-brand" href="index.php">Reforest Sri Lanka</a>
         <button class="navbar-toggler navbar-dark" type="button" data-toggle="collapse" data-target="#main-navigation">
