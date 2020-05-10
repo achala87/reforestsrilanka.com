@@ -50,7 +50,6 @@ require_once 'google/vendor/googlesheetdata.php'; //gsheetid
 <!-- Google recapcha vs -->
 <script src="https://www.google.com/recaptcha/api.js?render=6Lc7NPQUAAAAAKfUEB6bHdSgGML8cCzJL_FuaY5W"></script>
 
-
 </head>
 
 <body>
@@ -178,7 +177,7 @@ require_once 'google/vendor/googlesheetdata.php'; //gsheetid
             <label id="msg-error" class="error" for="msg"></label>
             </div>
             <small id="emailHelp" class="form-text text-muted">We'll never share your email/ number with anyone else.</small>
-            
+            <input type="hidden" id="token" name="token">
             <input type="submit" class="btn btn-block" value="submit" />
           </form>
           </div>
@@ -698,7 +697,8 @@ We also use modern equipment including Earth Augers to ensure we carry out tree 
   <script>
   grecaptcha.ready(function() {
       grecaptcha.execute('6Lc7NPQUAAAAAKfUEB6bHdSgGML8cCzJL_FuaY5W', {action: 'homepage'}).then(function(token) {
-        console.log(token);
+        //console.log(token);
+        document.getElementById("token").value = token;
       });
   });
   </script>
