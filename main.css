@@ -237,23 +237,3 @@ body {
 .modal-content .iframe-container-4x3 {
   padding-top: 75%;
 }
-
-.form-group {
-  margin-bottom: 2rem;
-}
-
-label {
-  font-size: 0.8rem;
-  font-weight: 500;
-  display: inline-block;
-  color: #fff;
-  margin-bottom: 0;
-}
-
-label.error {
-  position: absolute;
-  font-size: 0.78rem;
-  line-height: 1.25;
-  padding-top: 4px;
-  color: #ff0000;
-}
