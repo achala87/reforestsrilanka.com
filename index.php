@@ -726,6 +726,7 @@ if (empty($values)) {
                     setTimeout(function() {
                         $('#ajaxResponse').html('<p></p>');
                     }, 3000);
+                    request.abort();
                 });
 
                 // Callback handler that will be called on failure
@@ -736,6 +737,7 @@ if (empty($values)) {
                         textStatus, errorThrown
                     );
                     $('#ajaxResponse').html('<p>Error please retry.</p>');
+                    request.abort();
                 });
 
                 // Callback handler that will be called regardless
@@ -744,6 +746,7 @@ if (empty($values)) {
                     // Reenable the inputs
                     $inputs.prop("disabled", false);
                 });
+
             }
         });
 
