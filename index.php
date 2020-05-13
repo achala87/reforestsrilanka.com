@@ -180,8 +180,7 @@ require_once 'google/vendor/googlesheetdata.php'; //gsheetid
                         <label id="userEmail-error" class="error" for="userEmail"></label>
                     </div>
                     <div class="form-group">
-                        <input type="phone" class="form-control" placeholder="Phone Number" name="phoneNumber"
-                            id="phoneNumber" value="">
+                        <input type="phone" class="form-control" placeholder="Phone Number" name="phoneNumber" id="phoneNumber" value="">
                         <label id="phoneNumber-error" class="error" for="phoneNumber"></label>
                     </div>
                     <div class="form-group">
@@ -643,7 +642,7 @@ if (empty($values)) {
         });
 
         jQuery.validator.addMethod('phone_rule', function(value, element) {
-            if (/^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/.test(value)) {
+            if (/^[\d]{9,10}$/.test(value)) {
                 return true;
             } else {
                 return false;
@@ -677,20 +676,15 @@ if (empty($values)) {
             // Prevent default posting of form - put here to work in case of errors
             event.preventDefault();
 
-            console.log("clicked");
+            console.log("clicked1");
 
             // Get user input values
             var userName = $('#userName').val();
             var userEmail = $('#userEmail').val();
             var phoneNumber = $('#phoneNumber').val();
             var msg = $('#msg').val();
-            //alert('hi');
-            if (userName != '' && (/^[a-zA-Z0-9_-]+$/.test(userName)) &&
-                userEmail != '' && /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(userEmail) &&
-                phoneNumber != '' && /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/.test(
-                    phoneNumber) &&
-                msg != '') {
-
+            
+            if (userName != '' && userEmail != '' && msg != '') {
                 $('#ajaxResponse').html('<p>We are processing</p>');
 
                 // setup some local variables
@@ -747,6 +741,8 @@ if (empty($values)) {
                     $inputs.prop("disabled", false);
                 });
 
+            }else{
+                console.log("Form not evaluated");
             }
         });
 
@@ -775,5 +771,4 @@ if (empty($values)) {
   });
   </script> -->
 </body>
-
 </html>
